@@ -279,52 +279,65 @@ def summarize_article(article_title, index):
 
 # Main function to control the app
 def main():
-    st.set_page_config(page_title='FinancialAdvisor')
+    st.set_page_config(page_title='AIAdvisor')
 
-    st.title("📊 Indian Financial News Summarizer")
+    if "show_section" not in st.session_state:
+        st.session_state.show_section = False
 
-    # Define news sources
-    NEWS_SOURCES = {
-        "Economic Times": "https://economictimes.indiatimes.com/markets",
-        "Moneycontrol": "https://www.moneycontrol.com/news/",
-        "Business Standard": "https://www.business-standard.com/latest-news"
-    }
+    # if st.button("Toggle Section"):
+        # st.session_state.show_section = not st.session_state.show_section
 
-    # Example: Adding articles
-    articles_db = [
-        {"title": "Nifty Rises Amid Market Optimism", "content": "The Nifty 50 rose by 1.5% as investors showed optimism..."},
-        {"title": "RBI Updates on Inflation", "content": "RBI announced a 0.25% rate hike to curb inflationary pressures..."}
-    ]
-    # Store in FAISS
-    # vector_store, index = create_vector_store(articles)
-    texts = [article['content'] for article in articles_db]  # Extract only text
-    # vector_store, index = create_vector_store(texts)
+    st.title("Personal AI Advisor")
 
-    # Select source
-    source = st.selectbox("Choose a news source", list(NEWS_SOURCES.keys()))
 
-    # Fetch and display articles
-    if st.button("🔍 Fetch News"):
-        articles, index = add_articles_to_faiss(NEWS_SOURCES[source])
-        # summary = summarize_article(article_url, index)
-        if articles:
-            st.write("### ✅ Articles Stored for Retrieval:")
-            for i, article in enumerate(articles):
-                st.write(f"{i+1}. [{article['title']}]({article['url']})")
-        else:
-            st.warning("No articles found!")
+    if st.session_state.show_section:
+        st.subheader("This section is visible!")
+        st.write("Click the button to toggle visibility.")
 
-    # Summarize selected article
-    article_url = st.text_input("Paste article URL to summarize")
+        st.title("📊 Indian Financial News Summarizer")
 
-    if st.button("📜 Summarize"):
-    # query = st.text_input("🔍 Enter Article Title or Topic")
-        if article_url:
-            summary = summarize_article(article_url, index)
-            st.write("### 📰 Summary:")
-            st.write(summary)
-        else:
-            st.warning("Please enter a valid topic or title!")
+        # Define news sources
+        NEWS_SOURCES = {
+            "Economic Times": "https://economictimes.indiatimes.com/markets",
+            "Moneycontrol": "https://www.moneycontrol.com/news/",
+            "Business Standard": "https://www.business-standard.com/latest-news"
+        }
+
+        # Example: Adding articles
+        articles_db = [
+            {"title": "Nifty Rises Amid Market Optimism", "content": "The Nifty 50 rose by 1.5% as investors showed optimism..."},
+            {"title": "RBI Updates on Inflation", "content": "RBI announced a 0.25% rate hike to curb inflationary pressures..."}
+        ]
+        # Store in FAISS
+        # vector_store, index = create_vector_store(articles)
+        texts = [article['content'] for article in articles_db]  # Extract only text
+        # vector_store, index = create_vector_store(texts)
+
+        # Select source
+        source = st.selectbox("Choose a news source", list(NEWS_SOURCES.keys()), disabled=True)
+
+        # Fetch and display articles
+        if st.button("🔍 Fetch News", disabled=True):
+            articles, index = add_articles_to_faiss(NEWS_SOURCES[source])
+            # summary = summarize_article(article_url, index)
+            if articles:
+                st.write("### ✅ Articles Stored for Retrieval:")
+                for i, article in enumerate(articles):
+                    st.write(f"{i+1}. [{article['title']}]({article['url']})")
+            else:
+                st.warning("No articles found!")
+
+        # Summarize selected article
+        article_url = st.text_input("Paste article URL to summarize")
+
+        if st.button("📜 Summarize", disabled=True):
+        # query = st.text_input("🔍 Enter Article Title or Topic")
+            if article_url:
+                summary = summarize_article(article_url, index)
+                st.write("### 📰 Summary:")
+                st.write(summary)
+            else:
+                st.warning("Please enter a valid topic or title!")
 
     with st.expander("Instructions to upload Text PDF/URL"):
         st.write("1. Pull up the side bar in top left corner.")
@@ -336,7 +349,7 @@ def main():
 
     # Sidebar for document source selection
     st.sidebar.subheader("Choose document source:")
-    option = st.sidebar.radio("Select one:", ("Upload PDF", "Upload EXCEL", "Enter Web URL"))
+    option = st.sidebar.radio("Select one:", ("Upload PDF", "Enter Web URL"))
 
     if "docs" not in st.session_state:
         st.session_state.docs = None
@@ -364,8 +377,9 @@ def main():
         if uploaded_file is not None:
             if st.session_state.docs is None:
                 with st.spinner("Loading documents..."):
-                    docs = get_excel(uploaded_file)
-                st.session_state.docs = docs
+                    # docs = get_excel(uploaded_file)
+                    st.error("Work in Progress! 🚨")
+                # st.session_state.docs = docs
 
     elif option == "Enter Web URL":
         url = st.sidebar.text_input("Enter URL", key="url_input")
@@ -456,7 +470,7 @@ def main():
             st.session_state.user_input = ""
 
     st.text_area("Enter your question:", key="user_input")
-    if st.session_state.vectorstore is not None or len(articles_db)>0:
+    if st.session_state.vectorstore is not None:
         st.button('Submit', on_click=submit_with_doc)  
     else:
         st.button('Submit', on_click=submit_without_doc)
