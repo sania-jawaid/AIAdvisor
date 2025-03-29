@@ -1,0 +1,16 @@
+langchain_community
+python-dotenv
+streamlit
+langchain
+groq
+faiss-cpu
+huggingface_hub
+bs4
+sentence-transformers
+pypdf
+newspaper3k
+beautifulsoup4
+requests
+lxml
+Pillow
+chromadb
